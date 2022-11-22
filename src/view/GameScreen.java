@@ -3,6 +3,8 @@ package view;
 import controller.PlayerActions;
 import model.GameIO;
 import model.GameModel;
+import model.Log;
+import model.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,15 +22,27 @@ public class GameScreen {
         this.logPrinter = new LogPrinter(model.getLog().getEntries());
     }
 
-    public void start() {
+    private void printGameBoard() {
+        model.printGameBoard();
+    }
 
+    public void start() {
         while(!model.endOfTheGame()) {
-            List<String> possibleActions = new ArrayList<>(Arrays.asList("attack", "save and exit game", "exit game"));
+            List<String> possibleActions = new ArrayList<>(Arrays.asList("attack", "buy a card (3 mana)", "upgrade a card", "save and exit game", "exit game"));
             OptionsMenu<String> actionsMenu = new OptionsMenu<>("What do you want to do next", possibleActions);
             try {
                 switch (actionsMenu.ask()) {
                     case "attack":
                         model.fight();
+                        printGameBoard();
+                        logPrinter.printLastEntries();
+                        break;
+                    case "buy a card (3 mana)":
+                        model.takeACard(model.getPlayer());
+                        logPrinter.printLastEntries();
+                        break;
+                    case "upgrade a card":
+                        model.upgradeCard();
                         logPrinter.printLastEntries();
                         break;
                     case "save and exit game":

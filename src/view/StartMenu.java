@@ -1,6 +1,7 @@
 package view;
 
 import controller.PlayerActions;
+import model.GameIO;
 import model.GameModel;
 
 import java.io.IOException;
@@ -31,7 +32,9 @@ public class StartMenu {
     }
 
     private void loadAndLaunchGame() throws ClassNotFoundException, IOException {
-
+        new GameIO();
+        GameModel game = GameIO.loadGame();
+        launchGame(game);
     }
 
     private void launchGame(GameModel game) {
@@ -41,9 +44,9 @@ public class StartMenu {
     }
 
     private void startNewGame() {
-        OptionsMenu<DifficultyMode> difficultyMenu = new OptionsMenu<DifficultyMode>("Difficulty mode?", Arrays.asList(DifficultyMode.values()) );
+        OptionsMenu<DifficultyMode> difficultyMenu = new OptionsMenu<DifficultyMode>("Difficulty mode?", Arrays.asList(DifficultyMode.values()));
         DifficultyMode difficulty = difficultyMenu.ask();
-        GameModel game = new GameModel();
+        GameModel game = new GameModel(difficulty);
         launchGame(game);
     }
 }

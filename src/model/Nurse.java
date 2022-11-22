@@ -2,8 +2,8 @@ package model;
 
 public class Nurse extends Card {
 
-    public Nurse(String name, int hp, int atk, TypeOfTribe tribeName) {
-        super(name, hp, atk, tribeName);
+    public Nurse(String name, int hp, int atk, int priceMana) {
+        super(name, hp, atk, TypeOfTribe.NURSE, priceMana );
     }
 
     public void specialAttributeDescription() {

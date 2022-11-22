@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import model.GameModel;
+import view.DifficultyMode;
 
 public class GameIO {
 
@@ -25,7 +26,7 @@ public class GameIO {
 
 
     public static void main(String[] args) {
-        GameModel game = new GameModel();
+        GameModel game = new GameModel(DifficultyMode.medium);
         try {
             GameIO.saveGame(game);
             GameModel loadedGame = GameIO.loadGame();
