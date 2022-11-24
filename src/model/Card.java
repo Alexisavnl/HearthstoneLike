@@ -7,12 +7,17 @@ public abstract class Card implements  Serializable {
     private int hp;
     private int atk;
     private TypeOfTribe tribeName;
+    private int priceMana;
 
-    public Card(String name, int hp, int atk, TypeOfTribe tribeName){
+    private int countUpgrade;
+
+    public Card(String name, int hp, int atk, TypeOfTribe tribeName, int priceMana){
         this.name = name;
         this.atk = atk;
         this.hp = hp;
         this.tribeName = tribeName;
+        this.priceMana = priceMana;
+        this.countUpgrade = 0;
     }
 
     public int attack() {

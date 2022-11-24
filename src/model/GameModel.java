@@ -16,7 +16,8 @@ public class GameModel implements Serializable {
     private DifficultyMode difficultyMode;
     public GameModel(DifficultyMode difficultyMode) {
         theLog = new Log();
-        pileOfCard = new ArrayList<Card>(){
+        this.difficultyMode = difficultyMode;
+        pileOfCard = new ArrayList<>() {
             {
                 add(new Nurse("test1"));
                 add(new Nurse("test2"));
@@ -130,5 +131,61 @@ public class GameModel implements Serializable {
         for(int i = 0; i < numberOfCards; i++) {
             player.addCard(pileOfCard.remove(0));
         }
+    }
+
+    public void verifyLifeCard(Card choosenCard,Card targetCard, Player attacker, Player attacked) {
+        if(choosenCard.attack() >= targetCard.getHP()){
+            theLog.addEntry("Well played "+ attacker.getName() +"! You kill the card");
+            if(choosenCard.attack() - targetCard.getHP() > 0 ) {
+                attacked.applyDamages(choosenCard.attack() - targetCard.getHP());
+                theLog.addEntry( attacker.getName() + " managed to inflict direct damage to your opponent");
+            }
+        }
+    }
+    public boolean attack(Card choosenCard,Card targetCard, Player attacker, Player attacked) {
+        verifyLifeCard(  choosenCard, targetCard,  attacker, attacked);
+        attacked.applyDamagesOnACard(choosenCard.attack(), targetCard);
+        if (!attacked.isAlive()) {
+            theLog.addEntry( attacked +" dies!");
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void upgradeCard() {
+        if (thePlayer.getGold() >= 10){
+            OptionsMenu<Card> cardAvailable = new OptionsMenu<Card>("Choose a card to upgrade:", thePlayer.getCards());
+            Card cardChosenToUpgrade = cardAvailable.ask();
+            if(cardChosenToUpgrade.getCountUpgrade() >= 4){
+                theLog.addEntry("The card is already upgraded to the maximum.");
+            } else {
+                cardChosenToUpgrade.upgradeCard();
+                cardChosenToUpgrade.setCountUpgrade(cardChosenToUpgrade.getCountUpgrade()+1);
+            }
+        } else {
+            theLog.addEntry("You don't have enough gold to upgrade your card. It takes 10 gold to upgrade a card.");
+        }
+
+    }
+
+    private Card strongestCard(List<Card> cards) {
+        Card strongestCard = cards.get(0);
+        for (Card c: cards){
+            if (c.attack() > strongestCard.attack()) {
+                strongestCard = c;
+            }
+        }
+        return  strongestCard;
+    }
+
+    private Card weakestCard(List<Card> cards) {
+        Card weakestCard = cards.get(0);
+        for (Card c: cards){
+            if (c.getHP() < weakestCard.getHP()) {
+                weakestCard = c;
+            }
+        }
+        return  weakestCard;
     }
 }

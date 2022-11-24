@@ -21,6 +21,9 @@ public class Player implements Serializable {
         this.name = name;
         this.hp = hp;
         this.cards = cards;
+        this.gold = 5;
+        this.mana = 1;
+        this.defaultAtk = 1;
     }
 
     public void setCards(List<Card> cards) {
@@ -43,8 +46,28 @@ public class Player implements Serializable {
         this.hp = hp;
     }
 
+    public void setGold(int gold) {this.gold = gold;}
+
+    public int getGold() {return gold;}
+
+    public void setMana(int mana) {this.mana = mana;}
+
+    public int getMana() {return mana;}
+
+    public String getName() {return name;}
+
+    public void setName(String name) {this.name = name;}
+
+    public void incGoldAndManaEachTurns() {
+        setGold(getGold()+1);
+        if(mana < MAX_MANA) {
+            setMana(getMana()+1);
+        }
+    }
+
     public void applyDamages(int damages) {
         this.hp -= damages;
+
     }
     private Card getCard(Card card) {
         int indexOfCard = this.cards.indexOf(card);
