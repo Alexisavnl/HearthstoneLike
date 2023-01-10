@@ -29,7 +29,7 @@ public class GameScreen {
     public void start() {
         while(!model.endOfTheGame()) {
             if(model.isPlayerTurn()) {
-                List<String> possibleActions = new ArrayList<>(Arrays.asList("attack", "put a card on the board", "end of round", "upgrade a card", "save and exit game", "exit game"));
+                List<String> possibleActions = new ArrayList<>(Arrays.asList("attack", "put a card on the board", "end of round", "upgrade all cards", "\033[32msave and exit game\033[0m", "\033[31mexit game\033[0m"));
                 OptionsMenu<String> actionsMenu = new OptionsMenu<>("What do you want to do next", possibleActions);
                 try {
                     switch (actionsMenu.ask()) {
@@ -39,21 +39,21 @@ public class GameScreen {
                             logPrinter.printLastEntries();
                             break;
                         case "put a card on the board":
-                            model.putACardOnBoard(model.getPlayer());
+                            model.putACardOnBoard();
                             logPrinter.printLastEntries();
                             break;
                         case "end of round":
                             model.playerHasFinishedRound();
                             logPrinter.printLastEntries();
                             break;
-                        case "upgrade a card":
-                            model.upgradeCard();
+                        case "upgrade all cards":
+                            model.upgradeAllCards();
                             logPrinter.printLastEntries();
                             break;
-                        case "save and exit game":
+                        case "\033[32msave and exit game\033[0m":
                             GameIO.saveGame(model);
                             System.out.println("Game saved!");
-                        case "exit game":
+                        case "\033[31mexit game\033[0m":
                             System.out.println("Exiting game...");
                             return;
                         default:

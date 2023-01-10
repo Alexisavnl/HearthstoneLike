@@ -1,22 +1,19 @@
 package model;
 
 import java.io.Serializable;
+import java.util.List;
 
-public abstract class Card extends Entity implements  Serializable {
+public abstract class Card extends Entity implements  Serializable, Fight {
 
     private TypeOfTribe tribeName;
     private int priceMana;
 
-    private int countUpgrade;
-
     private boolean justPlaced;
-
 
     public Card(String name, int hp, int atk, TypeOfTribe tribeName, int priceMana, boolean justPlaced){
         super(name,hp,atk,justPlaced);
         this.tribeName = tribeName;
         this.priceMana = priceMana;
-        this.countUpgrade = 0;
         this.justPlaced = justPlaced;
     }
 
@@ -24,27 +21,27 @@ public abstract class Card extends Entity implements  Serializable {
         this(name,hp,atk,tribeName,priceMana, true);
         this.tribeName = tribeName;
         this.priceMana = priceMana;
-        this.countUpgrade = 0;
     }
+
     public void setTribeName(TypeOfTribe tribeName ) {
         this.tribeName = tribeName;
     }
 
     public TypeOfTribe getTribeName() {return this.tribeName;}
 
-    abstract void specialAttributeDescription();
+    public abstract void specialAttributeDescription();
 
-    abstract short applySpecialAttack();
+    public abstract short applySpecialAttack();
 
-
-    public void upgradeCard() {
-        this.setAtk((int) Math.round(this.getAtk() * 1.3));
-        this.setHp((int) Math.round(this.getHp() * 1.3));
-        this.countUpgrade++;
+    @Override
+    public void fight(Card card, Player opponent) {
+        card.appliesDamage(this.getAtk());
+        this.appliesDamage(card.getAtk());
     }
 
-    public int getCountUpgrade() {
-        return countUpgrade;
+    @Override
+    public void fight(Player opponent) {
+        opponent.appliesDamage(this.getAtk());
     }
 
     public int getPriceMana() {
@@ -63,6 +60,10 @@ public abstract class Card extends Entity implements  Serializable {
         this.justPlaced = justPlaced;
     }
 
+    public void upgradeThisCard(int level) {
+        this.setAtk(this.getAtk() + level);
+        this.setHp(this.getHp() + level);
+    }
     @Override
     public String toString() {
         return "name='" + this.getName() + '\'' +

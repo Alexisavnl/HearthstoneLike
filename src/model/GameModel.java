@@ -1,5 +1,6 @@
 package model;
 
+import model.cards.FireBall;
 import view.DifficultyMode;
 import view.OptionsMenu;
 
@@ -26,24 +27,24 @@ public class GameModel implements Serializable {
         this.difficultyMode = difficultyMode;
         pileOfCard = new ArrayList<>() {
             {
-                add(new Nurse("test1"));
-                add(new Nurse("test2"));
-                add(new Nurse("test3"));
-                add(new Nurse("test4"));
-                add(new Nurse("test5"));
-                add(new Nurse("test6"));
-                add(new Nurse("test7"));
-                add(new Nurse("test8"));
-                add(new Nurse("test9"));
-                add(new Nurse("test10"));
-                add(new Nurse("test11"));
-                add(new Nurse("test12"));
-                add(new Nurse("test13"));
-                add(new Nurse("test14"));
-                add(new Nurse("test15"));
-                add(new Nurse("test16"));
-                add(new Nurse("test17"));
-                add(new Nurse("test18"));
+                add(new FireBall("test1"));
+                add(new FireBall("test2"));
+                add(new FireBall("test3"));
+                add(new FireBall("test4"));
+                add(new FireBall("test5"));
+                add(new FireBall("test6"));
+                add(new FireBall("test7"));
+                add(new FireBall("test8"));
+                add(new FireBall("test9"));
+                add(new FireBall("test10"));
+                add(new FireBall("test11"));
+                add(new FireBall("test12"));
+                add(new FireBall("test13"));
+                add(new FireBall("test14"));
+                add(new FireBall("test15"));
+                add(new FireBall("test16"));
+                add(new FireBall("test17"));
+                add(new FireBall("test18"));
             }
         };
         Collections.shuffle(pileOfCard);
@@ -79,7 +80,7 @@ public class GameModel implements Serializable {
     }
 
     public void playerFight() {
-        int damage;
+        Entity entityPlayer;
         if(thePlayer.isPlayed() && thePlayer.getCardsOnTheBoard().size() == 0) {
             theLog.addEntry("No action is possible at this time. Place a card or skip your turn.");
             return;
@@ -91,10 +92,10 @@ public class GameModel implements Serializable {
                 theLog.addEntry("you must wait until the next turn to play the card.");
                 return;
             }
-            damage = cardChoosen.getAtk();
+            entityPlayer = cardChoosen;
         } else {
             theLog.addEntry("You have no cards on the board. You will use your tower to attack");
-            damage = thePlayer.getAtk();
+            entityPlayer = thePlayer;
             thePlayer.setPlayed(true);
         }
         System.out.println(botPlayer.getCardsOnTheBoard());
@@ -105,13 +106,18 @@ public class GameModel implements Serializable {
             OptionsMenu<Entity> cardAvailableBot = new OptionsMenu<>("Who do you want to attack:",  possibleActions);
 
             Entity e = cardAvailableBot.ask();
-            e.appliesDamage(damage);
-
+            e.appliesDamage(entityPlayer.getAtk());
+            entityPlayer.appliesDamage(e.getAtk());
+            if(!e.isAlive()){
+                botPlayer.getCardsOnTheBoard().remove(e);
+            }
+            if(!entityPlayer.isAlive()) {
+                thePlayer.getCardsOnTheBoard().remove(entityPlayer);
+            }
     }
 
-    //proccess
+    //proccessBot
     public void botFight() {
-        System.out.println("carte dnas la main " + botPlayer.getCardsInHand());
         Collection<Card> collection = botPlayer.getCardsInHand();
         List<Card> cardToPose = collection.stream().filter(i -> {
             if(i.getPriceMana() <= botPlayer.getMana()){
@@ -121,41 +127,81 @@ public class GameModel implements Serializable {
             }
             return false;
         }).collect(Collectors.toList());
-        System.out.println("carte selec " + cardToPose.toString());
         botPlayer.getCardsInHand().removeAll(cardToPose);
-        System.out.println("after remove "+ botPlayer.getCardsInHand());
         botPlayer.getCardsOnTheBoard().addAll(cardToPose);
-        System.out.println(botPlayer.getCardsOnTheBoard().toString());
         List<Entity> botArmy = new ArrayList<Entity>(botPlayer.getCardsOnTheBoard());
         botArmy.add(botPlayer);
         Random r = new Random();
-        for(Entity e: botArmy) {
-            if (e.isPlayed() == false) {
-                if (thePlayer.getCardsOnTheBoard().size() > 0) {
-                    int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
-                    Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
-                    theLog.addEntry("The bot attack this " + targetCard.toString());
-                    theLog.addEntry("Your "+ targetCard.getTribeName() + " before attack: "+ targetCard.getHp() + "hp");
-                    targetCard.appliesDamage(e.getAtk());
-                    theLog.addEntry("Your " + targetCard.getName() + " after attack: "+ targetCard.getHp() + "hp");
-                    theLog.addEntry("Bot " + e.getName() + " before attack: "+ e.getHp() + "hp");
-                    e.appliesDamage(targetCard.getAtk());
-                    theLog.addEntry("Bot " + e.getName() + " after attack: "+ e.getHp() + "hp");
-                } else {
-                    theLog.addEntry("Bot attack your tower with this " + e.getName());
-                    theLog.addEntry("Your tower before attack " + thePlayer.getHp() + "hp");
-                    thePlayer.appliesDamage(e.getAtk());
-                    theLog.addEntry("Your tower after attack " + thePlayer.getHp() + "hp");
+
+        if(botPlayer.getCardsOnTheBoard().size() > 0){
+            for(Card card : List.copyOf(botPlayer.getCardsOnTheBoard())){
+                if((!card.isPlayed() && !card.isJustPlaced()) || card.getTribeName().equals(TypeOfTribe.FIREBALL)) {
+                    if (thePlayer.getCardsOnTheBoard().size() == 0) {
+                        theLog.addEntry("Player doesn't have cards on the board");
+                        theLog.addEntry(card.getName() + " attack the player");
+                        theLog.addEntry("Player HP : " + thePlayer.getHp());
+                        theLog.addEntry("");
+                        if (card.getTribeName().equals(TypeOfTribe.FIREBALL)) {
+                            FireBall fireBall = (FireBall) card;
+                            fireBall.fight(thePlayer);
+                            botPlayer.getCardsOnTheBoard().remove(card);
+                            theLog.addEntry("Fireball was used");
+                        } else {
+                            card.fight(thePlayer);
+                        }
+                    } else {
+
+                        System.out.println(thePlayer.getCardsOnTheBoard().size());
+                        int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
+                        Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
+
+                        theLog.addEntry("The bot attack this " + targetCard.toString());
+                        theLog.addEntry("Your " + targetCard.getTribeName() + " before attack: " + targetCard.getHp() + "hp");
+
+                        if (card.getTribeName().equals(TypeOfTribe.FIREBALL)) {
+                            FireBall fireBall = (FireBall) card;
+                            fireBall.fight(targetCard, thePlayer);
+                            botPlayer.getCardsOnTheBoard().remove(card);
+                            theLog.addEntry("Fireball was used");
+                        }
+
+                        theLog.addEntry("Your " + targetCard.getName() + " after attack: " + targetCard.getHp() + "hp");
+                        theLog.addEntry("Bot " + card.getName() + " before attack: " + card.getHp() + "hp");
+
+                        if (!card.isAlive()) {
+                            botPlayer.getCardsOnTheBoard().remove(card); //ici
+                        }
+
+                        if (!targetCard.isAlive()) {
+                            thePlayer.getCardsOnTheBoard().remove(targetCard); //ici
+                        }
+
+                    }
                 }
+            }
+        } else {
+            if(!botPlayer.isPlayed()){
+                botPlayer.fight(thePlayer);
             }
         }
         isPlayerTurn = true;
     }
 
+
+
     public void newRound() {
+        if(!thePlayer.isAlive()) {
+            theLog.addEntry("The bot wins the game");
+            return;
+        }
+        if(!botPlayer.isAlive()) {
+            theLog.addEntry("You win the game");
+            return;
+        }
         this.round++;
         thePlayer.setMana(round);
         botPlayer.setMana(round);
+        thePlayer.setGold(thePlayer.getGold() + 2);
         thePlayer.setPlayed(false);
         botPlayer.setPlayed(false);
         for(Card c: thePlayer.getCardsOnTheBoard()){
@@ -183,25 +229,46 @@ public class GameModel implements Serializable {
 
     public void takeACard(Player player) {
         if(pileOfCard.size() != 0){
-                player.addCardInHand(pileOfCard.remove(0));
-                theLog.addEntry(player.getName() + " picked the card: " +player.getCardsInHand().get(player.getCardsInHand().size() -1).toString());
+                Card drawnCard = pileOfCard.remove(0);
+                if(player.getLevel() > 0) {
+                    drawnCard.upgradeThisCard(player.getLevel());
+                }
+                player.addCardInHand(drawnCard);
+                theLog.addEntry(player.getName() + " picked the card: " +drawnCard.toString());
         } else {
             theLog.addEntry("The pile is empty");
         }
     }
-    public void putACardOnBoard(Player player) {
-        if(player.getCardsInHand().size() > 0){
-            if(cheapestCard(player.getCardsInHand()).getPriceMana() <= player.getMana() ) {
-                OptionsMenu<Card> cardAvailable = new OptionsMenu<>("Which card do you want to put on the board", thePlayer.getCardsInHand());
+
+    public void putACardOnBoard() {
+        if(thePlayer.getCardsInHand().size() > 0){
+            if(cheapestCard(thePlayer.getCardsInHand()).getPriceMana() <= thePlayer.getMana() ) {
+                OptionsMenu<Card> cardAvailable = new OptionsMenu<>("Which card do you want to put on the board?", thePlayer.getCardsInHand());
                 Card cardChosen = cardAvailable.ask();
-                if (cardChosen.getPriceMana() >= player.getMana()) {
+                if (cardChosen.getPriceMana() >= thePlayer.getMana()) {
                     theLog.addEntry("You don't have enough money to deposit this card");
-                } else if (!(cardChosen.getPriceMana() >= player.getMana())) {
-                    int indexOfCard = player.getCardsInHand().indexOf(cardChosen);
-                    Card c = player.getCardsInHand().remove(indexOfCard);
+                } else if (cardChosen.getTribeName().equals(TypeOfTribe.FIREBALL)) {
+                    FireBall fireBall = (FireBall) cardChosen;
+                    List<Entity> entities = new ArrayList<>(botPlayer.getCardsOnTheBoard());
+                    entities.add(botPlayer);
+                    OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", entities);
+                    Entity entity = cardBot.ask();
+                    fireBall.fight(entity);
+                    thePlayer.getCardsInHand().remove(cardChosen);
+                    if(entity.getHp() <= 0){
+                        if(entity instanceof Card){
+                            botPlayer.getCardsOnTheBoard().remove(entity);
+                        } else if(entity instanceof Player){
+                            System.out.println("\033[32Vous avez gagné !\033[0m");
+                        }
+                    }
+                }
+                else if (!(cardChosen.getPriceMana() >= thePlayer.getMana())) {
+                    int indexOfCard = thePlayer.getCardsInHand().indexOf(cardChosen);
+                    Card c = thePlayer.getCardsInHand().remove(indexOfCard);
                     c.setJustPlaced(true);
-                    player.addCardOnTheBoard(c);
-                    player.setMana(player.getMana() - cardChosen.getPriceMana());
+                    thePlayer.addCardOnTheBoard(c);
+                    thePlayer.setMana(thePlayer.getMana() - cardChosen.getPriceMana());
                 }
 
             } else {
@@ -219,37 +286,12 @@ public class GameModel implements Serializable {
     }
 
     public void verifyLifeCard(Card choosenCard,Card targetCard, Player attacker, Player attacked) {
-        if(choosenCard.getAtk() >= targetCard.getHp()){
-            theLog.addEntry("Well played "+ attacker.getName() +"! You kill the card");
-            if(choosenCard.getAtk() - targetCard.getHp() > 0 ) {
+        if (choosenCard.getAtk() >= targetCard.getHp()) {
+            theLog.addEntry("Well played " + attacker.getName() + "! You kill the card");
+            if (choosenCard.getAtk() - targetCard.getHp() > 0) {
                 attacked.appliesDamage(choosenCard.getAtk() - targetCard.getHp());
-                theLog.addEntry( attacker.getName() + " managed to inflict direct damage to your opponent");
+                theLog.addEntry(attacker.getName() + " managed to inflict direct damage to your opponent");
             }
-        }
-    }
-    public boolean attack(Card choosenCard,Card targetCard, Player attacker, Player attacked) {
-        verifyLifeCard(  choosenCard, targetCard,  attacker, attacked);
-        attacked.applyDamagesOnACard(choosenCard.getAtk(), targetCard);
-        if (!attacked.isAlive()) {
-            theLog.addEntry( attacked +" dies!");
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void upgradeCard() {
-        if (thePlayer.getGold() >= 10){
-            OptionsMenu<Card> cardAvailable = new OptionsMenu<Card>("Choose a card to upgrade:", thePlayer.getCardsInHand());
-            Card cardChosenToUpgrade = cardAvailable.ask();
-
-            if(cardChosenToUpgrade.getCountUpgrade() >= 4){
-                theLog.addEntry("The card is already upgraded to the maximum.");
-            } else {
-                cardChosenToUpgrade.upgradeCard();
-            }
-        } else {
-            theLog.addEntry("You have only " + thePlayer.getGold() + " gold. It takes 10 gold to upgrade a card.");
         }
     }
 
@@ -285,5 +327,22 @@ public class GameModel implements Serializable {
 
     public boolean isPlayerTurn() {
         return isPlayerTurn;
+    }
+
+    public void upgradeAllCards() {
+        System.out.println("ehherw");
+        if(thePlayer.getGold() >= 10 ){
+            thePlayer.setLevel(thePlayer.getLevel() + 1);
+            for(Card c: thePlayer.getCardsOnTheBoard()){
+                c.upgradeThisCard(thePlayer.getLevel());
+            }
+            for(Card c: thePlayer.getCardsInHand()) {
+                c.upgradeThisCard(thePlayer.getLevel());
+            }
+            thePlayer.setGold(thePlayer.getGold()-10);
+            return;
+        }
+        theLog.addEntry("Tu es trop pauvre pour augmenter de niveau");
+
     }
 }

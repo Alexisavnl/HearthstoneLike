@@ -12,13 +12,13 @@ import java.util.List;
 public class StartMenu {
 
     public void start() {
-        List<String> possibleActions = new ArrayList<>(Arrays.asList("start new game", "load", "exit game"));
-        OptionsMenu<String> actionsMenu = new OptionsMenu<>("Welcome to insertName!", possibleActions);
+        List<String> possibleActions = new ArrayList<>(Arrays.asList("Start new game", "Load", "Exit game"));
+        OptionsMenu<String> actionsMenu = new OptionsMenu<>("Welcome!", possibleActions);
         switch (actionsMenu.ask()) {
-            case "start new game":
+            case "Start new game":
                 startNewGame();
                 break;
-            case "load":
+            case "Load":
                 try {
                     loadAndLaunchGame();
                 } catch(Exception e) {
@@ -26,7 +26,7 @@ public class StartMenu {
                     start();
                 }
                 break;
-            case "exit game":
+            case "Exit game":
                 System.out.println("Thanks for playing!");
         }
     }

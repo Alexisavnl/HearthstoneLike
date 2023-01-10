@@ -1,6 +1,9 @@
 package model;
 
-public abstract class Entity {
+import java.io.Serializable;
+import java.util.List;
+
+public abstract class Entity implements Serializable {
     private String name;
     private int hp;
     private int atk;
@@ -52,7 +55,4 @@ public abstract class Entity {
     public void setPlayed(boolean isPlayed) {
         this.isPlayed = isPlayed;
     }
-
-    public abstract void fight(Card targetCard, Player opponent);
-    public abstract void fight(Player opponent);
 }

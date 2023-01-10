@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Player extends Entity implements Serializable{
+public class Player extends Entity implements Serializable, Fight{
 
     private static final int MAX_MANA = 10;
 
@@ -15,14 +15,16 @@ public class Player extends Entity implements Serializable{
 
     private int gold;
     private int mana;
+    private int level;
 
 
     public Player(int hp,List<Card> cards,String name) {
         super(name, hp, 1, false);
         this.cardsInHand = cards;
         this.cardsOnTheBoard = new ArrayList<>();
-        this.gold = 5;
+        this.gold = 8;
         this.mana = 1;
+        this.level = 0;
     }
 
     public void setCards(List<Card> cards) {
@@ -60,13 +62,6 @@ public class Player extends Entity implements Serializable{
 
     public int getMana() {return mana;}
 
-    public void incGoldAndManaEachTurns() {
-        setGold(getGold()+1);
-        if(mana < MAX_MANA) {
-            setMana(getMana()+1);
-        }
-    }
-
     private Card getCard(Card card) {
         int indexOfCard = this.cardsInHand.indexOf(card);
         return cardsInHand.get(indexOfCard);
@@ -83,9 +78,9 @@ public class Player extends Entity implements Serializable{
         cardsInHand.remove(card);
     }
 
-    public boolean canBuyCard() {
-        return mana > 3 && cardsInHand.size() < 4;
-    }
+    public void setLevel(int level) {this.level = level;}
+
+    public int getLevel() {return level;}
 
     @Override
     public String toString() {
@@ -93,13 +88,17 @@ public class Player extends Entity implements Serializable{
     }
 
     @Override
-    public void fight(Card targetCard, Player opponent) {
-        targetCard.appliesDamage(this.getAtk());
-        this.appliesDamage(targetCard.getAtk());
+    public void fight(Card card, Player opponent) {
+        card.appliesDamage(this.getAtk());
     }
 
     @Override
     public void fight(Player opponent) {
         opponent.appliesDamage(this.getAtk());
+    }
+
+    @Override
+    public void fight(Entity entity) {
+        entity.appliesDamage(this.getAtk());
     }
 }
