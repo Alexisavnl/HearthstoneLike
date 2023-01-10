@@ -5,45 +5,51 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Player implements Serializable {
+public class Player extends Entity implements Serializable{
 
     private static final int MAX_MANA = 10;
-    private String name;
-    private int hp;
-    private List<Card> cards;
+
+    private List<Card> cardsInHand;
+
+    private List<Card> cardsOnTheBoard;
+
     private int gold;
     private int mana;
 
-    private int defaultAtk;
-
 
     public Player(int hp,List<Card> cards,String name) {
-        this.name = name;
-        this.hp = hp;
-        this.cards = cards;
+        super(name, hp, 1, false);
+        this.cardsInHand = cards;
+        this.cardsOnTheBoard = new ArrayList<>();
         this.gold = 5;
         this.mana = 1;
-        this.defaultAtk = 1;
     }
 
     public void setCards(List<Card> cards) {
-         this.cards = cards;
+         this.cardsInHand = cards;
     }
 
-    public List<Card> getCards() {
-        return cards;
+    public List<Card> getCardsInHand() {
+        return cardsInHand;
     }
 
-    public void addCard(Card card) {
-        this.cards.add(card);
+    public void addCardInHand(Card cardsInHand) {
+        this.cardsInHand.add(cardsInHand);
+    }
+    public void setCardsInHand(List<Card> cardsInHand) {
+        this.cardsInHand = cardsInHand;
     }
 
-    public int getHp() {
-        return hp;
+    public List<Card> getCardsOnTheBoard() {
+        return cardsOnTheBoard;
     }
 
-    public void setHp(short hp) {
-        this.hp = hp;
+    public void setCardsOnTheBoard(List<Card> cardsOnTheBoard) {
+        this.cardsOnTheBoard = cardsOnTheBoard;
+    }
+
+    public void addCardOnTheBoard(Card cardsOnTheBoard) {
+        this.cardsOnTheBoard.add(cardsOnTheBoard);
     }
 
     public void setGold(int gold) {this.gold = gold;}
@@ -54,10 +60,6 @@ public class Player implements Serializable {
 
     public int getMana() {return mana;}
 
-    public String getName() {return name;}
-
-    public void setName(String name) {this.name = name;}
-
     public void incGoldAndManaEachTurns() {
         setGold(getGold()+1);
         if(mana < MAX_MANA) {
@@ -65,13 +67,9 @@ public class Player implements Serializable {
         }
     }
 
-    public void applyDamages(int damages) {
-        this.hp -= damages;
-
-    }
     private Card getCard(Card card) {
-        int indexOfCard = this.cards.indexOf(card);
-        return cards.get(indexOfCard);
+        int indexOfCard = this.cardsInHand.indexOf(card);
+        return cardsInHand.get(indexOfCard);
     }
 
     public void applyDamagesOnACard(int damages, Card card) {
@@ -82,36 +80,26 @@ public class Player implements Serializable {
     }
 
     public void removeCard(Card card) {
-        cards.remove(card);
-    }
-
-    public boolean isAlive() {
-        return this.hp > 0;
+        cardsInHand.remove(card);
     }
 
     public boolean canBuyCard() {
-        return mana > 3 && cards.size() < 4;
-    }
-
-    public int getDefaultAtk() {
-        return defaultAtk;
-    }
-
-    public void setDefaultAtk(int defaultAtk) {
-        this.defaultAtk = defaultAtk;
+        return mana > 3 && cardsInHand.size() < 4;
     }
 
     @Override
     public String toString() {
-        String display = name + " have " + hp + " hp";
-        display += "\n Card on the board:";
-        if(cards.size() > 0) {
-            for(Card card: cards){
-                display += " - " + card.toString() + "\n";
-            }
-        } else {
-            display += "No cards on the board";
-        }
-        return display;
+        return this.getName() + " tower have " + this.getHp() + " hp";
+    }
+
+    @Override
+    public void fight(Card targetCard, Player opponent) {
+        targetCard.appliesDamage(this.getAtk());
+        this.appliesDamage(targetCard.getAtk());
+    }
+
+    @Override
+    public void fight(Player opponent) {
+        opponent.appliesDamage(this.getAtk());
     }
 }

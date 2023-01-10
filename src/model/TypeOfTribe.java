@@ -1,5 +1,5 @@
 package model;
 
 public enum TypeOfTribe {
-    NURSE, KAMIKAZE, REGULAR
+    NURSE, KAMIKAZE, REGULAR, FIREBALL
 }
