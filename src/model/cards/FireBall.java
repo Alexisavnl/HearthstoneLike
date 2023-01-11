@@ -9,6 +9,7 @@ import view.OptionsMenu;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class FireBall extends Card implements Serializable {
 
@@ -23,28 +24,20 @@ public class FireBall extends Card implements Serializable {
 
     @Override
     public void applySpecialAttack(Player player, Player opponent) {
-        System.out.println("efw");
+        this.specialAttributeDescription();
         List<Entity> targetList = new ArrayList<>(opponent.getCardsOnTheBoard());
         targetList.add(opponent);
-        this.specialAttributeDescription();
-        OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", targetList);
-        Entity entity = cardBot.ask();
+        Entity entity;
+        if(player.getName() == "Your tower") {
+            OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", targetList);
+            entity = cardBot.ask();
+        } else {
+            Random r = new Random();
+            //todo check random
+            entity = targetList.get(r.nextInt(targetList.size()+1));
+        }
         entity.appliesDamage(this.getAtk());
     }
 
-    @Override
-    public void fight(Card card, Player opponent) {
-        card.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Player opponent) {
-        opponent.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Entity entity){
-        entity.appliesDamage(this.getAtk());
-    }
 
 }

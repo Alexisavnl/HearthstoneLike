@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Player extends Entity implements Serializable, Fight{
+public class Player extends Entity implements Serializable {
 
     private static final int MAX_MANA = 10;
 
@@ -82,23 +82,14 @@ public class Player extends Entity implements Serializable, Fight{
 
     public int getLevel() {return level;}
 
-    @Override
-    public String toString() {
-        return this.getName() + " tower have " + this.getHp() + " hp";
-    }
-
-    @Override
-    public void fight(Card card, Player opponent) {
-        card.appliesDamage(this.getAtk());
-    }
-
-    @Override
     public void fight(Player opponent) {
         opponent.appliesDamage(this.getAtk());
     }
 
     @Override
-    public void fight(Entity entity) {
-        entity.appliesDamage(this.getAtk());
+    public String toString() {
+        return this.getName() + " have " + this.getHp() + " hp";
     }
+
+
 }

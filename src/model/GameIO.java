@@ -26,7 +26,7 @@ public class GameIO {
 
 
     public static void main(String[] args) {
-        GameModel game = new GameModel(DifficultyMode.medium);
+        GameModel game = new GameModel(DifficultyMode.Medium);
         try {
             GameIO.saveGame(game);
             GameModel loadedGame = GameIO.loadGame();

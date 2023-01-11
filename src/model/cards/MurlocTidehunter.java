@@ -23,21 +23,7 @@ public class MurlocTidehunter extends Card implements Serializable {
     public void applySpecialAttack(Player player, Player opponent) {
         this.specialAttributeDescription();
         player.getCardsOnTheBoard().add(new MurlocScout());
-    }
-
-    @Override
-    public void fight(Card card, Player opponent) {
-        card.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Player opponent) {
-        opponent.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Entity entity){
-        entity.appliesDamage(this.getAtk());
+        System.out.println("Murloc Tidehunter played the card Murloc Scout.");
     }
 
 }

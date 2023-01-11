@@ -32,19 +32,4 @@ public class RaidLeader extends Card implements Serializable {
         }
     }
 
-    @Override
-    public void fight(Card card, Player opponent) {
-        card.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Player opponent) {
-        opponent.appliesDamage(this.getAtk());
-    }
-
-    @Override
-    public void fight(Entity entity){
-        entity.appliesDamage(this.getAtk());
-    }
-
 }

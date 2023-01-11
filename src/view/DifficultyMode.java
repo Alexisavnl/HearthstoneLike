@@ -2,9 +2,9 @@ package view;
 
 public enum DifficultyMode {
 
-    hard(2),
-    medium(1),
-    easy(0);
+    Hard(2),
+    Medium(1),
+    Easy(0);
 
     private int choice;
 

@@ -29,31 +29,31 @@ public class GameScreen {
     public void start() {
         while(!model.endOfTheGame()) {
             if(model.isPlayerTurn()) {
-                List<String> possibleActions = new ArrayList<>(Arrays.asList("attack", "put a card on the board", "end of round", "upgrade all cards", "\033[32msave and exit game\033[0m", "\033[31mexit game\033[0m"));
-                OptionsMenu<String> actionsMenu = new OptionsMenu<>("What do you want to do next", possibleActions);
+                List<String> possibleActions = new ArrayList<>(Arrays.asList("Attack", "Put a card on the board", "End of round", "Upgrade all cards", "\033[32mSave and exit game\033[0m", "\033[31mExit game\033[0m"));
+                OptionsMenu<String> actionsMenu = new OptionsMenu<>("\033[96mMake a choice:\n----------------------------------\033[0m", possibleActions);
                 try {
                     switch (actionsMenu.ask()) {
-                        case "attack":
+                        case "Attack":
                             model.playerFight();
                             printGameBoard();
                             logPrinter.printLastEntries();
                             break;
-                        case "put a card on the board":
+                        case "Put a card on the board":
                             model.putACardOnBoard();
                             logPrinter.printLastEntries();
                             break;
-                        case "end of round":
+                        case "End of round":
                             model.playerHasFinishedRound();
                             logPrinter.printLastEntries();
                             break;
-                        case "upgrade all cards":
+                        case "Upgrade all cards":
                             model.upgradeAllCards();
                             logPrinter.printLastEntries();
                             break;
-                        case "\033[32msave and exit game\033[0m":
+                        case "\033[32mSave and exit game\033[0m":
                             GameIO.saveGame(model);
                             System.out.println("Game saved!");
-                        case "\033[31mexit game\033[0m":
+                        case "\033[31mExit game\033[0m":
                             System.out.println("Exiting game...");
                             return;
                         default:

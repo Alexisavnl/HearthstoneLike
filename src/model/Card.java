@@ -3,22 +3,19 @@ package model;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class Card extends Entity implements  Serializable, Fight {
+public abstract class Card extends Entity implements  Serializable {
 
     private TypeOfTribe tribeName;
     private int priceMana;
 
-    private boolean justPlaced;
-
-    public Card(String name, int hp, int atk, TypeOfTribe tribeName, int priceMana, boolean justPlaced){
-        super(name,hp,atk,justPlaced);
+    public Card(String name, int hp, int atk, TypeOfTribe tribeName, int priceMana, boolean canPlay){
+        super(name,hp,atk,canPlay);
         this.tribeName = tribeName;
         this.priceMana = priceMana;
-        this.justPlaced = justPlaced;
     }
 
     public Card(String name, int hp, int atk, TypeOfTribe tribeName, int priceMana){
-        this(name,hp,atk,tribeName,priceMana, true);
+        this(name,hp,atk,tribeName,priceMana, false);
         this.tribeName = tribeName;
         this.priceMana = priceMana;
     }
@@ -37,13 +34,11 @@ public abstract class Card extends Entity implements  Serializable, Fight {
         this.specialAttributeDescription();
     }
 
-    @Override
     public void fight(Card card, Player opponent) {
         card.appliesDamage(this.getAtk());
         this.appliesDamage(card.getAtk());
     }
 
-    @Override
     public void fight(Player opponent) {
         opponent.appliesDamage(this.getAtk());
     }
@@ -54,14 +49,6 @@ public abstract class Card extends Entity implements  Serializable, Fight {
 
     public void setPriceMana(int priceMana) {
         this.priceMana = priceMana;
-    }
-
-    public boolean isJustPlaced() {
-        return justPlaced;
-    }
-
-    public void setJustPlaced(boolean justPlaced) {
-        this.justPlaced = justPlaced;
     }
 
     public void upgradeThisCard(int level) {

@@ -8,12 +8,12 @@ public abstract class Entity implements Serializable {
     private int hp;
     private int atk;
 
-    private boolean isPlayed;
-    public Entity(String name, int hp, int atk, boolean isPlayed) {
+    private boolean canPlay;
+    public Entity(String name, int hp, int atk, boolean canPlay) {
         this.name = name;
         this.hp = hp;
         this.atk = atk;
-        this.isPlayed = isPlayed;
+        this.canPlay = canPlay;
     }
 
     public String getName() {
@@ -48,11 +48,11 @@ public abstract class Entity implements Serializable {
         return this.hp > 0;
     }
 
-    public boolean isPlayed() {
-        return isPlayed;
+    public boolean isCanPlay() {
+        return canPlay;
     }
 
-    public void setPlayed(boolean isPlayed) {
-        this.isPlayed = isPlayed;
+    public void setCanPlay(boolean canPlay) {
+        this.canPlay = canPlay;
     }
 }
