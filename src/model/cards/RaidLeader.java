@@ -4,32 +4,32 @@ import model.Card;
 import model.Entity;
 import model.Player;
 import model.TypeOfTribe;
-import view.OptionsMenu;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FireBall extends Card implements Serializable {
+public class RaidLeader extends Card implements Serializable {
 
-    public FireBall() {
-        super("Fireball", 0, 6, TypeOfTribe.FIREBALL,4);
+    public RaidLeader() {
+        super("Raid Leader", 3,2,TypeOfTribe.RAIDLEADER,3);
     }
 
     @Override
     public void specialAttributeDescription() {
-        System.out.println("Special attack description: Deal 6 damage.");
+        System.out.println("Special attack description: Your other minions have +1 Attack.");
     }
 
     @Override
     public void applySpecialAttack(Player player, Player opponent) {
-        System.out.println("efw");
-        List<Entity> targetList = new ArrayList<>(opponent.getCardsOnTheBoard());
-        targetList.add(opponent);
-        this.specialAttributeDescription();
-        OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", targetList);
-        Entity entity = cardBot.ask();
-        entity.appliesDamage(this.getAtk());
+        for(Card c: player.getCardsOnTheBoard()) {
+            c.setAtk(c.getAtk()+1);
+        }
+    }
+
+    public void removeEffect(Player player){
+        for(Card c: player.getCardsOnTheBoard()) {
+            c.setAtk(c.getAtk()-1);
+        }
     }
 
     @Override

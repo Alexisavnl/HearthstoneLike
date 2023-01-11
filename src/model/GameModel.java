@@ -27,24 +27,24 @@ public class GameModel implements Serializable {
         this.difficultyMode = difficultyMode;
         pileOfCard = new ArrayList<>() {
             {
-                add(new FireBall("test1"));
-                add(new FireBall("test2"));
-                add(new FireBall("test3"));
-                add(new FireBall("test4"));
-                add(new FireBall("test5"));
-                add(new FireBall("test6"));
-                add(new FireBall("test7"));
-                add(new FireBall("test8"));
-                add(new FireBall("test9"));
-                add(new FireBall("test10"));
-                add(new FireBall("test11"));
-                add(new FireBall("test12"));
-                add(new FireBall("test13"));
-                add(new FireBall("test14"));
-                add(new FireBall("test15"));
-                add(new FireBall("test16"));
-                add(new FireBall("test17"));
-                add(new FireBall("test18"));
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
+                add(new FireBall());
             }
         };
         Collections.shuffle(pileOfCard);
@@ -98,11 +98,8 @@ public class GameModel implements Serializable {
             entityPlayer = thePlayer;
             thePlayer.setPlayed(true);
         }
-        System.out.println(botPlayer.getCardsOnTheBoard());
             List<Entity> possibleActions = new ArrayList<Entity>(botPlayer.getCardsOnTheBoard());
-        System.out.println(possibleActions);
             possibleActions.add(botPlayer);
-        System.out.println(possibleActions);
             OptionsMenu<Entity> cardAvailableBot = new OptionsMenu<>("Who do you want to attack:",  possibleActions);
 
             Entity e = cardAvailableBot.ask();
@@ -150,8 +147,6 @@ public class GameModel implements Serializable {
                             card.fight(thePlayer);
                         }
                     } else {
-
-                        System.out.println(thePlayer.getCardsOnTheBoard().size());
                         int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
                         Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
 
@@ -245,32 +240,18 @@ public class GameModel implements Serializable {
             if(cheapestCard(thePlayer.getCardsInHand()).getPriceMana() <= thePlayer.getMana() ) {
                 OptionsMenu<Card> cardAvailable = new OptionsMenu<>("Which card do you want to put on the board?", thePlayer.getCardsInHand());
                 Card cardChosen = cardAvailable.ask();
-                if (cardChosen.getPriceMana() >= thePlayer.getMana()) {
+                if (cardChosen.getPriceMana() > thePlayer.getMana()) {
                     theLog.addEntry("You don't have enough money to deposit this card");
-                } else if (cardChosen.getTribeName().equals(TypeOfTribe.FIREBALL)) {
-                    FireBall fireBall = (FireBall) cardChosen;
-                    List<Entity> entities = new ArrayList<>(botPlayer.getCardsOnTheBoard());
-                    entities.add(botPlayer);
-                    OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", entities);
-                    Entity entity = cardBot.ask();
-                    fireBall.fight(entity);
-                    thePlayer.getCardsInHand().remove(cardChosen);
-                    if(entity.getHp() <= 0){
-                        if(entity instanceof Card){
-                            botPlayer.getCardsOnTheBoard().remove(entity);
-                        } else if(entity instanceof Player){
-                            System.out.println("\033[32Vous avez gagné !\033[0m");
-                        }
-                    }
-                }
-                else if (!(cardChosen.getPriceMana() >= thePlayer.getMana())) {
+                } else {
                     int indexOfCard = thePlayer.getCardsInHand().indexOf(cardChosen);
                     Card c = thePlayer.getCardsInHand().remove(indexOfCard);
-                    c.setJustPlaced(true);
-                    thePlayer.addCardOnTheBoard(c);
+                    if(c.getHp() != 0) {
+                        c.setJustPlaced(true);
+                        thePlayer.addCardOnTheBoard(c);
+                    }
                     thePlayer.setMana(thePlayer.getMana() - cardChosen.getPriceMana());
+                    c.applySpecialAttack(thePlayer, botPlayer);
                 }
-
             } else {
                 theLog.addEntry("You don't have enough money to deposit a card");
             }
@@ -330,7 +311,6 @@ public class GameModel implements Serializable {
     }
 
     public void upgradeAllCards() {
-        System.out.println("ehherw");
         if(thePlayer.getGold() >= 10 ){
             thePlayer.setLevel(thePlayer.getLevel() + 1);
             for(Card c: thePlayer.getCardsOnTheBoard()){

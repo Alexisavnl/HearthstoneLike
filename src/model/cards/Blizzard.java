@@ -4,32 +4,28 @@ import model.Card;
 import model.Entity;
 import model.Player;
 import model.TypeOfTribe;
-import view.OptionsMenu;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FireBall extends Card implements Serializable {
+public class Blizzard extends Card implements Serializable {
 
-    public FireBall() {
-        super("Fireball", 0, 6, TypeOfTribe.FIREBALL,4);
+    public Blizzard(String name) {
+        super("Blizzard", 0, 2, TypeOfTribe.ELVENARCHER,6);
     }
 
     @Override
     public void specialAttributeDescription() {
-        System.out.println("Special attack description: Deal 6 damage.");
+        System.out.println("Deal 2 damage to all enemy minions and Freeze them.");
     }
 
     @Override
     public void applySpecialAttack(Player player, Player opponent) {
-        System.out.println("efw");
-        List<Entity> targetList = new ArrayList<>(opponent.getCardsOnTheBoard());
-        targetList.add(opponent);
         this.specialAttributeDescription();
-        OptionsMenu<Entity> cardBot = new OptionsMenu<>("Which card do you want to target ?", targetList);
-        Entity entity = cardBot.ask();
-        entity.appliesDamage(this.getAtk());
+        for(Card c: opponent.getCardsOnTheBoard()) {
+            c.setPlayed(true);
+            c.appliesDamage(this.getAtk());
+        }
     }
 
     @Override

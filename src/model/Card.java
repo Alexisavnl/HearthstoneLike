@@ -29,9 +29,13 @@ public abstract class Card extends Entity implements  Serializable, Fight {
 
     public TypeOfTribe getTribeName() {return this.tribeName;}
 
-    public abstract void specialAttributeDescription();
+    public void specialAttributeDescription() {
+        System.out.println("Special attack description: No special attack");
+    }
 
-    public abstract short applySpecialAttack();
+    public void applySpecialAttack(Player player, Player opponent) {
+        this.specialAttributeDescription();
+    }
 
     @Override
     public void fight(Card card, Player opponent) {
