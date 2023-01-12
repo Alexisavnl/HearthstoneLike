@@ -149,22 +149,26 @@ public class GameModel implements Serializable {
                 if(card.isCanPlay()) {
                     if (thePlayer.getCardsOnTheBoard().size() == 0) {
                         theLog.addEntry("Player doesn't have cards on the board");
-                        theLog.addEntry(card.getName() + " attack the player");
-                        theLog.addEntry("Player HP : " + thePlayer.getHp());
-                        theLog.addEntry("");
+                        theLog.addEntry(card.getName() + " attack"+ thePlayer.getName() +"\n");
                         if (card.getTribeName().equals(TypeOfTribe.FIREBALL)) {
                             FireBall fireBall = (FireBall) card;
+                            int playerHpBeforeAtk = thePlayer.getHp();
                             fireBall.fight(thePlayer);
                             botPlayer.getCardsOnTheBoard().remove(card);
                             theLog.addEntry("Fireball was used");
+                            theLog.addEntry(thePlayer.getName() + " HP: " + playerHpBeforeAtk + " -> " + thePlayer.getHp() + ".");
                         } else {
+                            int playerHpBeforeAtk = thePlayer.getHp();
                             card.fight(thePlayer);
+                            theLog.addEntry(thePlayer.getName() + " HP: " + playerHpBeforeAtk + " -> " + thePlayer.getHp() + ".");
                         }
                     } else {
                         int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
                         Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
 
                         theLog.addEntry("The bot attack this " + targetCard.toString());
+                        theLog.addEntry("Your " + targetCard.getTribeName() + " has lost");
+                        //TODO: don't understand how this code works ? Ever used ?
                         theLog.addEntry("Your " + targetCard.getTribeName() + " before attack: " + targetCard.getHp() + "hp");
 
 
@@ -190,10 +194,22 @@ public class GameModel implements Serializable {
         //todo export
         if(!thePlayer.isAlive()) {
             theLog.addEntry("The bot wins the game");
+            theLog.addEntry("\033[31m __  __     ______     __  __        __         ______     ______     ______    \n" +
+                    "/\\ \\_\\ \\   /\\  __ \\   /\\ \\/\\ \\      /\\ \\       /\\  __ \\   /\\  ___\\   /\\  ___\\   \n" +
+                    "\\ \\____ \\  \\ \\ \\/\\ \\  \\ \\ \\_\\ \\     \\ \\ \\____  \\ \\ \\/\\ \\  \\ \\___  \\  \\ \\  __\\   \n" +
+                    " \\/\\_____\\  \\ \\_____\\  \\ \\_____\\     \\ \\_____\\  \\ \\_____\\  \\/\\_____\\  \\ \\_____\\ \n" +
+                    "  \\/_____/   \\/_____/   \\/_____/      \\/_____/   \\/_____/   \\/_____/   \\/_____/ \n" +
+                    "                                                                                \033[0m");
             return;
         }
         if(!botPlayer.isAlive()) {
             theLog.addEntry("You win the game");
+            theLog.addEntry("\033[32m __  __     ______     __  __        __     __     __     __   __    \n" +
+                    "/\\ \\_\\ \\   /\\  __ \\   /\\ \\/\\ \\      /\\ \\  _ \\ \\   /\\ \\   /\\ \"-.\\ \\   \n" +
+                    "\\ \\____ \\  \\ \\ \\/\\ \\  \\ \\ \\_\\ \\     \\ \\ \\/ \".\\ \\  \\ \\ \\  \\ \\ \\-.  \\  \n" +
+                    " \\/\\_____\\  \\ \\_____\\  \\ \\_____\\     \\ \\__/\".~\\_\\  \\ \\_\\  \\ \\_\\\\\"\\_\\ \n" +
+                    "  \\/_____/   \\/_____/   \\/_____/      \\/_/   \\/_/   \\/_/   \\/_/ \\/_/ \n" +
+                    "                                                                     \033[0m");
             return;
         }
         this.round++;
@@ -239,11 +255,11 @@ public class GameModel implements Serializable {
     public void putACardOnBoard() {
         if(thePlayer.getCardsInHand().size() > 0){
             if(cheapestCard(thePlayer.getCardsInHand()).getPriceMana() <= thePlayer.getMana() ) {
-                OptionsMenu<Card> cardAvailable = new OptionsMenu<>("\033[96mPick the card you want to put on board: \n" +
+                OptionsMenu<Card> cardAvailable = new OptionsMenu<>("\n\033[96mPick the card you want to put on board: \n" +
                         "----------------------------------\033[0m", thePlayer.getCardsInHand());
                 Card cardChosen = cardAvailable.ask();
                 if (cardChosen.getPriceMana() > thePlayer.getMana()) {
-                    theLog.addEntry("You don't have enough money to deposit this card");
+                    theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough money to deposit this card.");
                 } else {
                     int indexOfCard = thePlayer.getCardsInHand().indexOf(cardChosen);
                     Card c = thePlayer.getCardsInHand().remove(indexOfCard);
@@ -256,10 +272,10 @@ public class GameModel implements Serializable {
                     deadCardsCleaner();
                 }
             } else {
-                theLog.addEntry("You don't have enough money to deposit a card.");
+                theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough money to deposit a card.");
             }
         } else {
-            theLog.addEntry("You don't have cards in your hand.");
+            theLog.addEntry("\033[31mWARNING:\033[0m You don't have cards in your hand.");
         }
     }
 

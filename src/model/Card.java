@@ -57,10 +57,7 @@ public abstract class Card extends Entity implements  Serializable {
     }
     @Override
     public String toString() {
-        return "name='" + this.getName() + '\'' +
-                ", hp=" + this.getHp() +
-                ", atk=" + this.getAtk() +
-                ", tribeName=" + tribeName;
+        return this.getName() + " (" + this.getHp() + "HP and " + this.getAtk() + " ATK)";
     }
 
 

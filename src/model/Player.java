@@ -83,7 +83,9 @@ public class Player extends Entity implements Serializable {
     public int getLevel() {return level;}
 
     public void fight(Player opponent) {
+        int opponentHPBeforeAttack = opponent.getHp();
         opponent.appliesDamage(this.getAtk());
+        System.out.println(opponent.getName() + " has lost " + this.getAtk() + " : " + opponentHPBeforeAttack + " HP -> " + opponent.getHp() + " HP.");
     }
 
     @Override

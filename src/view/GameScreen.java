@@ -30,7 +30,11 @@ public class GameScreen {
         while(!model.endOfTheGame()) {
             if(model.isPlayerTurn()) {
                 List<String> possibleActions = new ArrayList<>(Arrays.asList("Attack", "Put a card on the board", "End of round", "Upgrade all cards", "\033[32mSave and exit game\033[0m", "\033[31mExit game\033[0m"));
-                OptionsMenu<String> actionsMenu = new OptionsMenu<>("\033[96mMake a choice:\n----------------------------------\033[0m", possibleActions);
+                OptionsMenu<String> actionsMenu = new OptionsMenu<>("\n\033[96mMake a choice:\033[0m\n" +
+                        "\033[96m----------------------------------\033[0m\n" +
+                        "\033[32mPlayer HP: " + model.getPlayer().getHp() + "\033[0m\n" +
+                        "\033[31mBot HP: " + model.getBotPlayer().getHp() + "\033[0m\n"
+                        , possibleActions);
                 try {
                     switch (actionsMenu.ask()) {
                         case "Attack":
