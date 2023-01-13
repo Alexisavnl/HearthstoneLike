@@ -284,7 +284,7 @@ public class GameModel implements Serializable {
                 cardChosen.applySpecialAttack(thePlayer, botPlayer);
                 deadCardsCleaner();
             } else {
-                theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough money to deposit a card.");
+                theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough mana to deposit a card.");
             }
         } else {
             theLog.addEntry("\033[31mWARNING:\033[0m You don't have cards in your hand.");
