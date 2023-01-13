@@ -34,7 +34,6 @@ public class FireBall extends Card implements Serializable {
             entity = cardBot.ask();
         } else {
             Random r = new Random();
-            //todo check random
             entity = targetList.get(r.nextInt(targetList.size()));
         }
         entity.appliesDamage(this.getAtk());

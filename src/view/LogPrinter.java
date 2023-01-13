@@ -18,10 +18,4 @@ public class LogPrinter {
         }
         System.out.println(""); // empty line
     }
-
-    public void printWhole() {
-        for(String entry: entriesList) {
-            System.out.println(entry);
-        }
-    }
 }

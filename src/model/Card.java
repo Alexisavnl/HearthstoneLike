@@ -20,10 +20,6 @@ public abstract class Card extends Entity implements  Serializable {
         this.priceMana = priceMana;
     }
 
-    public void setTribeName(TypeOfTribe tribeName ) {
-        this.tribeName = tribeName;
-    }
-
     public TypeOfTribe getTribeName() {return this.tribeName;}
 
     public void specialAttributeDescription() {
@@ -32,11 +28,6 @@ public abstract class Card extends Entity implements  Serializable {
 
     public void applySpecialAttack(Player player, Player opponent) {
         this.specialAttributeDescription();
-    }
-
-    public void fight(Card card, Player opponent) {
-        card.appliesDamage(this.getAtk());
-        this.appliesDamage(card.getAtk());
     }
 
     public int getPriceMana() {
