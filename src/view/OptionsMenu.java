@@ -18,12 +18,12 @@ public class OptionsMenu<OptionType> {
     public OptionType ask() {
         System.out.println(question);
         for(int i = 0; i < options.size(); i++) {
-            System.out.println(i + ") " + options.get(i));
+            System.out.println((i+1) + ") " + options.get(i));
         }
         System.out.println("Type an option number and press <enter>:");
         try {
             int optionIndex = Integer.parseInt(scanner.nextLine(), 10);
-            return options.get(optionIndex);
+            return options.get(optionIndex-1);
         } catch(Exception e) {
             System.out.println("Invalid option, try again");
             return ask();

@@ -11,7 +11,7 @@ import java.util.List;
 public class Blizzard extends Card implements Serializable {
 
     public Blizzard() {
-        super("Blizzard", 0, 2, TypeOfTribe.ELVENARCHER,6);
+        super("Blizzard", -999, 2, TypeOfTribe.BLIZZARD,6);
     }
 
     @Override
@@ -26,6 +26,11 @@ public class Blizzard extends Card implements Serializable {
             c.setCanPlay(false);
             c.appliesDamage(this.getAtk());
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.getName() + " ("+ this.getAtk() + " ATK and cost " +this.getPriceMana() + " mana)";
     }
 
 }

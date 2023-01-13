@@ -19,7 +19,7 @@ public class Player extends Entity implements Serializable {
 
 
     public Player(int hp,List<Card> cards,String name) {
-        super(name, hp, 1, false);
+        super(name, hp, 1, true);
         this.cardsInHand = cards;
         this.cardsOnTheBoard = new ArrayList<>();
         this.gold = 8;
@@ -88,9 +88,13 @@ public class Player extends Entity implements Serializable {
         System.out.println(opponent.getName() + " has lost " + this.getAtk() + " : " + opponentHPBeforeAttack + " HP -> " + opponent.getHp() + " HP.");
     }
 
+    public String getStringHP(){
+        return this.getName() + " have " + this.getHp() + " HP";
+    }
+
     @Override
     public String toString() {
-        return this.getName() + " have " + this.getHp() + " hp";
+        return this.getName() + "("+ this.getAtk() + " ATK, " + this.getHp() +" HP)";
     }
 
 

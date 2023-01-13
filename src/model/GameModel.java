@@ -1,6 +1,7 @@
 package model;
 
 import model.cards.*;
+import org.w3c.dom.ls.LSOutput;
 import view.DifficultyMode;
 import view.OptionsMenu;
 
@@ -61,8 +62,11 @@ public class GameModel implements Serializable {
                 break;
         }
         thePlayer = new Player(20, new ArrayList<>(), "Your tower");
+        System.out.println("borad debugger "+botPlayer.getCardsOnTheBoard());
         this.takeCards(thePlayer, 1);
         this.takeCards(botPlayer, 1);
+        takeACard(thePlayer);
+        System.out.println("board debugger "+botPlayer.getCardsOnTheBoard());
     }
     public Log getLog() {
         return theLog;
@@ -81,17 +85,34 @@ public class GameModel implements Serializable {
     }
 
     public void deadCardsCleaner() {
-        Collection<Card> botCollection = botPlayer.getCardsInHand();
-        List<Card> newBotCards = botCollection.stream().filter(i -> i.isAlive()
-        ).collect(Collectors.toList());
+        Collection<Card> botCollection = botPlayer.getCardsOnTheBoard();
+        List<Card> newBotCards = botCollection.stream().filter(i -> {
+            if(!i.isAlive()){
+                if(i.getTribeName()==TypeOfTribe.RAIDLEADER){
+                    RaidLeader raidLeader = (RaidLeader) i;
+                    raidLeader.removeEffect(botPlayer);
+                }
+                theLog.addEntry("This card enemy was dead "+i.getName());
+            }
+           return i.isAlive();
+        }).collect(Collectors.toList());
         botPlayer.setCardsOnTheBoard(newBotCards);
-        Collection<Card> playerCollection = botPlayer.getCardsInHand();
-        List<Card> newPlayerCards = playerCollection.stream().filter(i -> i.isAlive()
+        Collection<Card> playerCollection = thePlayer.getCardsOnTheBoard();
+        List<Card> newPlayerCards = playerCollection.stream().filter(i -> {
+            if(!i.isAlive()){
+                if(i.getTribeName()==TypeOfTribe.RAIDLEADER){
+                    RaidLeader raidLeader = (RaidLeader) i;
+                    raidLeader.removeEffect(thePlayer);
+                }
+                theLog.addEntry("Your card was dead "+i.getName());
+            }
+            return i.isAlive();
+            }
         ).collect(Collectors.toList());
         thePlayer.setCardsOnTheBoard(newPlayerCards);
     }
     public void playerFight() {
-        Entity entityPlayer;
+        System.out.println(thePlayer.isCanPlay());
         if(!thePlayer.isCanPlay() && thePlayer.getCardsOnTheBoard().size() == 0) {
             theLog.addEntry("No action is possible at this time. Place a card or skip your turn.");
             return;
@@ -101,33 +122,40 @@ public class GameModel implements Serializable {
         List<Entity> onlyFightersCanAttack = allFighters.stream().filter(i -> i.isCanPlay()
         ).collect(Collectors.toList());
         if(onlyFightersCanAttack.size() > 0) {
-
             OptionsMenu<Entity> cardAvailablePlayer = new OptionsMenu<>("\n\033[96mPick the card you want to use to attack:\n" +
                     "----------------------------------\033[0m", onlyFightersCanAttack);
             Entity entityChoosen = cardAvailablePlayer.ask();
+            System.out.println("debugger " + botPlayer.getCardsOnTheBoard());
             List<Entity> possibleActions = new ArrayList<Entity>(botPlayer.getCardsOnTheBoard());
             possibleActions.add(botPlayer);
+            System.out.println("debugger " + botPlayer.getCardsOnTheBoard());
             OptionsMenu<Entity> cardAvailableBot = new OptionsMenu<>("\n\033[96mPick the card to attack:\n" +
                     "----------------------------------\033[0m",  possibleActions);
 
             Entity e = cardAvailableBot.ask();
+            theLog.addEntry("The bot: " + e.getName() + " before attack: " + e.getHp() + "hp");
             e.appliesDamage(entityChoosen.getAtk());
-            entityChoosen.appliesDamage(e.getAtk());
+            theLog.addEntry("The bot: " + e.getName() + " after attack: " + e.getHp() + "hp\n");
+            if(entityChoosen.getName() != "Your tower") {
+                theLog.addEntry("Your " + entityChoosen.getName() + " before attack: " + entityChoosen.getHp() + "hp");
+                entityChoosen.appliesDamage(e.getAtk());
+                theLog.addEntry("Your " + entityChoosen.getName() + " after attack: " + entityChoosen.getHp() + "hp\n");
+            }
+            entityChoosen.setCanPlay(false);
             deadCardsCleaner();
         } else {
             theLog.addEntry("No action is possible at this time. Place a card or skip your turn.");
-            return;
         }
 
     }
 
-    //proccessBot
     public void botFight() {
+        takeACard(botPlayer);
         Collection<Card> collection = botPlayer.getCardsInHand();
         //todo verifier si le filter macher bien
         List<Card> cardToPose = collection.stream().filter(i -> {
             if(i.getPriceMana() <= botPlayer.getMana()){
-                theLog.addEntry("The bot has placed this card on the board " + i.toString());
+                System.out.println("The bot has placed this card on the board " + i.toString());
                 botPlayer.setMana(botPlayer.getMana() - i.getPriceMana());
                 return true;
             }
@@ -142,50 +170,38 @@ public class GameModel implements Serializable {
         }
         List<Entity> botArmy = new ArrayList<Entity>(botPlayer.getCardsOnTheBoard());
         botArmy.add(botPlayer);
+        System.out.println("debugger " + botArmy);
         Random r = new Random();
 
-        if(botPlayer.getCardsOnTheBoard().size() > 0){
-            for(Card card : List.copyOf(botPlayer.getCardsOnTheBoard())){
-                if(card.isCanPlay()) {
-                    if (thePlayer.getCardsOnTheBoard().size() == 0) {
-                        theLog.addEntry("Player doesn't have cards on the board");
-                        theLog.addEntry(card.getName() + " attack"+ thePlayer.getName() +"\n");
-                        if (card.getTribeName().equals(TypeOfTribe.FIREBALL)) {
-                            FireBall fireBall = (FireBall) card;
-                            int playerHpBeforeAtk = thePlayer.getHp();
-                            fireBall.fight(thePlayer);
-                            botPlayer.getCardsOnTheBoard().remove(card);
-                            theLog.addEntry("Fireball was used");
-                            theLog.addEntry(thePlayer.getName() + " HP: " + playerHpBeforeAtk + " -> " + thePlayer.getHp() + ".");
-                        } else {
-                            int playerHpBeforeAtk = thePlayer.getHp();
-                            card.fight(thePlayer);
-                            theLog.addEntry(thePlayer.getName() + " HP: " + playerHpBeforeAtk + " -> " + thePlayer.getHp() + ".");
-                        }
-                    } else {
-                        int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
-                        Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
+        for(Entity entity : List.copyOf(botArmy)){
+            if(entity.isCanPlay()) {
+                if (thePlayer.getCardsOnTheBoard().size() == 0) {
+                    theLog.addEntry("You doesn't have cards on the board");
+                    theLog.addEntry(entity.getName() + " attack your tower \n");
+                    theLog.addEntry("Your tower before attack: " + thePlayer.getHp() + "hp");
+                    thePlayer.appliesDamage(entity.getAtk());
+                    theLog.addEntry("Your tower after attack: " + thePlayer.getHp() + "hp\n");
+                } else {
+                    System.out.println("debug carte sur le terrain "+thePlayer.getCardsOnTheBoard());
+                    int indexTarget = r.nextInt(thePlayer.getCardsOnTheBoard().size());
+                    Card targetCard = thePlayer.getCardsOnTheBoard().get(indexTarget);
 
-                        theLog.addEntry("The bot attack this " + targetCard.toString());
-                        theLog.addEntry("Your " + targetCard.getTribeName() + " has lost");
-                        //TODO: don't understand how this code works ? Ever used ?
-                        theLog.addEntry("Your " + targetCard.getTribeName() + " before attack: " + targetCard.getHp() + "hp");
-
-
-                        theLog.addEntry("Your " + targetCard.getName() + " after attack: " + targetCard.getHp() + "hp");
-                        theLog.addEntry("Bot " + card.getName() + " before attack: " + card.getHp() + "hp");
-
-                        deadCardsCleaner();
-
+                    theLog.addEntry("The bot use this " +(entity.getName() == "The bot tower" ? "tower" : entity.getName()) + " for attack your card " + targetCard.toString() + "\n");
+                    theLog.addEntry("Your " + targetCard.getName() + " before attack: " + targetCard.getHp() + "hp");
+                    targetCard.appliesDamage(entity.getAtk());
+                    theLog.addEntry("Your " + targetCard.getName() + " after attack: " + targetCard.getHp() + "hp\n");
+                    if(entity.getName() != "The bot tower") {
+                        theLog.addEntry("Bot card " + entity.getName() + " before attack: " + entity.getHp() + "hp");
+                        entity.appliesDamage(targetCard.getAtk());
+                        theLog.addEntry("Bot " + entity.getName() + " after attack: " + entity.getHp() + "hp\n");
                     }
+                    deadCardsCleaner();
                 }
             }
-        } else {
-            if(botPlayer.isCanPlay()){
-                botPlayer.fight(thePlayer);
-            }
         }
+
         isPlayerTurn = true;
+        newRound();
     }
 
 
@@ -225,18 +241,18 @@ public class GameModel implements Serializable {
             c.setCanPlay(true);
         }
         takeACard(thePlayer);
-        takeACard(botPlayer);
     }
 
+
+
     public void playerHasFinishedRound() {
-        newRound();
         isPlayerTurn = false;
     }
 
 
     public void printGameBoard() {
-        theLog.addEntry(botPlayer.toString());
-        theLog.addEntry(thePlayer.toString());
+        theLog.addEntry(botPlayer.getStringHP());
+        theLog.addEntry(thePlayer.getStringHP());
     }
 
     public void takeACard(Player player) {
@@ -255,22 +271,18 @@ public class GameModel implements Serializable {
     public void putACardOnBoard() {
         if(thePlayer.getCardsInHand().size() > 0){
             if(cheapestCard(thePlayer.getCardsInHand()).getPriceMana() <= thePlayer.getMana() ) {
+                List<Card> cardCanBuy = thePlayer.getCardsInHand().stream().filter(i->i.getPriceMana()<= thePlayer.getMana()).collect(Collectors.toList());
                 OptionsMenu<Card> cardAvailable = new OptionsMenu<>("\n\033[96mPick the card you want to put on board: \n" +
-                        "----------------------------------\033[0m", thePlayer.getCardsInHand());
+                        "----------------------------------\033[0m", cardCanBuy);
                 Card cardChosen = cardAvailable.ask();
-                if (cardChosen.getPriceMana() > thePlayer.getMana()) {
-                    theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough money to deposit this card.");
-                } else {
-                    int indexOfCard = thePlayer.getCardsInHand().indexOf(cardChosen);
-                    Card c = thePlayer.getCardsInHand().remove(indexOfCard);
-                    if(c.getHp() != 0) {
-                        c.setCanPlay(false);
-                        thePlayer.addCardOnTheBoard(c);
-                    }
-                    thePlayer.setMana(thePlayer.getMana() - cardChosen.getPriceMana());
-                    c.applySpecialAttack(thePlayer, botPlayer);
-                    deadCardsCleaner();
+                thePlayer.getCardsInHand().remove(cardChosen);
+                if(cardChosen.getHp() > 0) {
+                    cardChosen.setCanPlay(false);
+                    thePlayer.addCardOnTheBoard(cardChosen);
                 }
+                thePlayer.setMana(thePlayer.getMana() - cardChosen.getPriceMana());
+                cardChosen.applySpecialAttack(thePlayer, botPlayer);
+                deadCardsCleaner();
             } else {
                 theLog.addEntry("\033[31mWARNING:\033[0m You don't have enough money to deposit a card.");
             }
@@ -283,36 +295,6 @@ public class GameModel implements Serializable {
         for(int i = 0; i < numberOfCards; i++) {
             player.addCardInHand(pileOfCard.remove(0));
         }
-    }
-
-    public void verifyLifeCard(Card choosenCard,Card targetCard, Player attacker, Player attacked) {
-        if (choosenCard.getAtk() >= targetCard.getHp()) {
-            theLog.addEntry("Well played " + attacker.getName() + "! You kill the card.");
-            if (choosenCard.getAtk() - targetCard.getHp() > 0) {
-                attacked.appliesDamage(choosenCard.getAtk() - targetCard.getHp());
-                theLog.addEntry(attacker.getName() + " managed to inflict direct damage to your opponent.");
-            }
-        }
-    }
-
-    private Card strongestCard(List<Card> cards) {
-        Card strongestCard = cards.get(0);
-        for (Card c: cards){
-            if (c.getAtk() > strongestCard.getAtk()) {
-                strongestCard = c;
-            }
-        }
-        return  strongestCard;
-    }
-
-    private Card weakestCard(List<Card> cards) {
-        Card weakestCard = cards.get(0);
-        for (Card c: cards){
-            if (c.getHp() < weakestCard.getHp()) {
-                weakestCard = c;
-            }
-        }
-        return  weakestCard;
     }
 
     private Card cheapestCard(List<Card> cards) {

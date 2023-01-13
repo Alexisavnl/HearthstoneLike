@@ -12,8 +12,4 @@ public enum DifficultyMode {
         this.choice = choice;
     }
 
-    public int getChoice() {
-        return choice;
-    }
-
 }

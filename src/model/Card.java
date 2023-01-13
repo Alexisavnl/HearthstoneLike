@@ -39,16 +39,8 @@ public abstract class Card extends Entity implements  Serializable {
         this.appliesDamage(card.getAtk());
     }
 
-    public void fight(Player opponent) {
-        opponent.appliesDamage(this.getAtk());
-    }
-
     public int getPriceMana() {
         return priceMana;
-    }
-
-    public void setPriceMana(int priceMana) {
-        this.priceMana = priceMana;
     }
 
     public void upgradeThisCard(int level) {
@@ -57,7 +49,7 @@ public abstract class Card extends Entity implements  Serializable {
     }
     @Override
     public String toString() {
-        return this.getName() + " (" + this.getHp() + "HP and " + this.getAtk() + " ATK)";
+        return this.getName() + " (" + this.getHp() + "HP, " + this.getAtk() + " ATK and cost " +this.getPriceMana() + " mana)";
     }
 
 

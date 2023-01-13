@@ -21,6 +21,7 @@ public class RaidLeader extends Card implements Serializable {
 
     @Override
     public void applySpecialAttack(Player player, Player opponent) {
+        this.specialAttributeDescription();
         for(Card c: player.getCardsOnTheBoard()) {
             c.setAtk(c.getAtk()+1);
         }

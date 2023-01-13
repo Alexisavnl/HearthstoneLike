@@ -35,6 +35,7 @@ public class GameScreen {
                         "\033[32mPlayer HP: " + model.getPlayer().getHp() + "\033[0m\n" +
                         "\033[31mBot HP: " + model.getBotPlayer().getHp() + "\033[0m\n"
                         , possibleActions);
+                logPrinter.printLastEntries();
                 try {
                     switch (actionsMenu.ask()) {
                         case "Attack":
