@@ -58,7 +58,11 @@ public class Player extends Entity implements Serializable {
 
     public int getGold() {return gold;}
 
-    public void setMana(int mana) {this.mana = mana;}
+    public void setMana(int mana) {
+        if(mana < MAX_MANA){
+            this.mana = mana;
+        }
+    }
 
     public int getMana() {return mana;}
 
