@@ -27,19 +27,12 @@ public class Player extends Entity implements Serializable {
         this.level = 0;
     }
 
-    public void setCards(List<Card> cards) {
-         this.cardsInHand = cards;
-    }
-
     public List<Card> getCardsInHand() {
         return cardsInHand;
     }
 
     public void addCardInHand(Card cardsInHand) {
         this.cardsInHand.add(cardsInHand);
-    }
-    public void setCardsInHand(List<Card> cardsInHand) {
-        this.cardsInHand = cardsInHand;
     }
 
     public List<Card> getCardsOnTheBoard() {
@@ -49,7 +42,7 @@ public class Player extends Entity implements Serializable {
     public void setCardsOnTheBoard(List<Card> cardsOnTheBoard) {
         this.cardsOnTheBoard = cardsOnTheBoard;
     }
-
+    
     public void addCardOnTheBoard(Card cardsOnTheBoard) {
         this.cardsOnTheBoard.add(cardsOnTheBoard);
     }
@@ -66,31 +59,9 @@ public class Player extends Entity implements Serializable {
 
     public int getMana() {return mana;}
 
-    private Card getCard(Card card) {
-        int indexOfCard = this.cardsInHand.indexOf(card);
-        return cardsInHand.get(indexOfCard);
-    }
-
-    public void applyDamagesOnACard(int damages, Card card) {
-        getCard(card).appliesDamage(damages);
-        if(!card.isAlive()) {
-            removeCard(card);
-        }
-    }
-
-    public void removeCard(Card card) {
-        cardsInHand.remove(card);
-    }
-
     public void setLevel(int level) {this.level = level;}
 
     public int getLevel() {return level;}
-
-    public void fight(Player opponent) {
-        int opponentHPBeforeAttack = opponent.getHp();
-        opponent.appliesDamage(this.getAtk());
-        System.out.println(opponent.getName() + " has lost " + this.getAtk() + " : " + opponentHPBeforeAttack + " HP -> " + opponent.getHp() + " HP.");
-    }
 
     public String getStringHP(){
         return this.getName() + " have " + this.getHp() + " HP";
